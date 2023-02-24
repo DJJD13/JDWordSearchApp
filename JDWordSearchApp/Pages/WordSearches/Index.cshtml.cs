@@ -99,13 +99,13 @@ namespace JDWordSearchApp.Pages.WordSearches
                     }
                     else
                     {
+                        var space = dims - rndCol;
+                        if (space < word.Length)
+                        {
+                            continue;
+                        }
                         for (int j = 0; j < word.Length; j++)
                         {
-                            var space = dims - rndCol;
-                            if (space < word.Length)
-                            {
-                                continue;
-                            }
                             if (j < word.Length)
                             {
                                 if (wordSearchArray[j + rndRow, rndCol] == word[j] || wordSearchArray[j + rndRow, rndCol] == '\0')

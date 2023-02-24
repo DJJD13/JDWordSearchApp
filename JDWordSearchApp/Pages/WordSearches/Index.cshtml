@@ -88,6 +88,8 @@
             let dimError = true;
             let wordError = true;
 
+            var wordArr = new Array();
+
             $(function () {
                 $('#dimensions').on('focusout', function () {
                     var dim = parseInt($("#dimensions").val());
@@ -126,7 +128,6 @@
                         e.preventDefault();
                         var dim = parseInt($("#dimensions").val());
                         var listItems = $("#wordsChosen li");
-                        var wordArr = new Array();
                         listItems.each(function(idx, li) {
                             var word = $(li).text();
                             console.log(word);
@@ -150,6 +151,27 @@
                         for (var i = 0; i < wordArr.length; i++) {
                             $("#wordList").prepend('<li>' + wordArr[i] + '</li>');
                         }
+                    }
+                    else {
+                        alert('Please make sure your fields are valid');
+                    }
+                });
+            });
+            $(function () {
+                $('#regen').on('click', function (e) {
+                    if (dimError == true && wordError == true) {
+                        e.preventDefault();
+                        var dim = parseInt($("#dimensions").val());
+                        var wordData = { dims: dim, words: wordArr };
+                        console.log(wordData);
+                        $.ajax({
+                            url: "/WordSearches/Index?handler=Partial",
+                            type: 'GET',
+                            data: wordData,
+                            traditional: true
+                        }).done(function (result) {
+                            $('#wordgame').html(result);
+                        });
                     }
                     else {
                         alert('Please make sure your fields are valid');
