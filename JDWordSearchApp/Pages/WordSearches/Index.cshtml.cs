@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using JDWordSearchApp.Data;
 using JDWordSearchApp.Models;
+using System.Drawing;
 
 
 namespace JDWordSearchApp.Pages.WordSearches
@@ -58,37 +59,71 @@ namespace JDWordSearchApp.Pages.WordSearches
                     // horizontal or vertical, and either backwards or forwards
                     int rndRow = rnd.Next(dims);
                     int rndCol = rnd.Next(dims);
-                    int horOrVer = rnd.Next(3) - 1;
+                    int horOrVer = rnd.Next(100);
+                    
+                    var len = word.Length;
+                    var count = 0;
+
 
                     // If < 50, the word will be horizontal, else it will be vertical
-                    if (horOrVer < dims / 2)
+                    if (horOrVer < 50)
                     {
-                        var wordLimit = word.Length - dims;
+                        var space = dims - rndCol;
+                        if(space < word.Length)
+                        {
+                            continue;
+                        }
                         for (int j = 0; j < word.Length; j++)
                         {
                             if (j < word.Length)
                             {
-                                if (wordSearchArray[rndRow, j] == word[j] || wordSearchArray[rndRow, j] == '\0')
+                                if (wordSearchArray[rndRow, rndCol + j] == word[j] || wordSearchArray[rndRow, rndCol + j] == '\0')
                                 {
-                                    wordSearchArray[rndRow, j] = word[j];
+                                    wordSearchArray[rndRow, rndCol + j] = word[j];
+                                    count++;
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
+                        }
+                        if(count == len)
+                        {
+                            inserted = true;
+                        }
+                        else
+                        {
+                            continue;
                         }
                     }
                     else
                     {
                         for (int j = 0; j < word.Length; j++)
                         {
+                            var space = dims - rndCol;
+                            if (space < word.Length)
+                            {
+                                continue;
+                            }
                             if (j < word.Length)
                             {
-                                if (wordSearchArray[j, rndCol] == word[j] || wordSearchArray[j, rndCol] == '\0')
+                                if (wordSearchArray[j + rndRow, rndCol] == word[j] || wordSearchArray[j + rndRow, rndCol] == '\0')
                                 {
-                                    wordSearchArray[j, rndCol] = word[j];
+                                    wordSearchArray[j + rndRow, rndCol] = word[j];
+                                    count++;
                                 }
                             }
                         }
+                        if (count == len)
+                        {
+                            inserted = true;
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
-                    inserted = true;
                 }
             }
 
