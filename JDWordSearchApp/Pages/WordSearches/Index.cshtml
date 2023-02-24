@@ -1,0 +1,162 @@
+﻿@page
+@model JDWordSearchApp.Pages.WordSearches.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>JD's Word Search C# APP</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WordSearch[0].Dimensions)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WordSearch[0].Words)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.WordSearch) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dimensions)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Words)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New Stored Word Search</a>
+</p>
+
+<h2>Create Word Search App Below</h2>
+<br />
+<br />
+<h6 id="dimNumber">0</h6>
+<ul id="wordsChosen"></ul>
+<br />
+<br />
+<div class="container p-5 align-content-center">
+    <form action="post" id="wordForm">
+        <div class="mb-3">
+            <label class="my-1 me-2" for="dimensions">Enter Word Search Dimensions</label>
+            <input name="dimensions" id="dimensions" type="number" class="form-control" />
+            <small id="wordSearchDimHelp" class="form-text text-muted">Only 1 number is required, as the Word Search will be a square</small>
+            <p id="dimcheck" style="color: red;">Please enter only a number</p>
+        </div>
+        <div class="input-group mb-3">
+            <label class="my-1 me-2" for="words">Enter Words you would like to use</label>
+            <input name="words" id="words" type="text" class="form-control"  />
+            <button id="AddWord" class="btn btn-info">Add Word</button>
+            <p id="wordcheck" style="color: red;">Word length must be less than the dimensions you set</p>
+        </div>
+        <br />
+        <button id="submit" class="btn btn-primary">Generate Word Search</button>
+    </form>
+</div>
+<div class="container">
+    <div class="align-content-center">
+        <button id="regen" class="btn btn-primary">Remake Word Search</button>
+    </div>
+    <div class="row">
+        <div id="wordgame" class="col-auto"></div>
+        <div class="col-sm-4">
+            <ul id="wordList"></ul>
+        </div>
+    </div>
+</div>
+
+@*@await Html.PartialAsync("/Pages/Shared/_PartialWordSearch.cshtml", "Hello")*@
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('#dimcheck').hide();
+            $('#wordcheck').hide();
+            $('#regen').hide();
+            let dimError = true;
+            let wordError = true;
+
+            $(function () {
+                $('#dimensions').on('focusout', function () {
+                    var dim = parseInt($("#dimensions").val());
+                    if (isNaN(dim)) {
+                        $('#dimcheck').show();
+                        dimError = false;
+                        return false;
+                    } else {
+                        $('#dimcheck').hide();
+                        $("#dimNumber").text(dim);
+                        dimError = true;
+                    }
+                });
+            });
+            $(function () {
+                $('#AddWord').on('click', function (e) {
+                    var dim = parseInt($('#dimensions').val());
+                    var word = $("#words").val();
+                    if(word.length > dim ) {
+                        $('#wordcheck').show();
+                        wordError = false;
+                        return false;
+                    } else {
+                        e.preventDefault();
+                        $("#wordsChosen").prepend('<li>' + word + '</li>');
+                        $('input[type="text"]').val("");
+                        $('#wordcheck').hide();
+                        wordError = true;
+                    }
+                    
+                });
+            });
+            $(function () {
+                $('#submit').on('click', function (e) {
+                    if (dimError == true && wordError == true ) {
+                        e.preventDefault();
+                        var dim = parseInt($("#dimensions").val());
+                        var listItems = $("#wordsChosen li");
+                        var wordArr = new Array();
+                        listItems.each(function(idx, li) {
+                            var word = $(li).text();
+                            console.log(word);
+                            wordArr[idx] = word.toUpperCase();
+                        });
+                        var wordData = { dims: dim, words: wordArr };
+                        console.log(wordData);
+                        $.ajax({
+                            url: "/WordSearches/Index?handler=Partial",
+                            type: 'GET',
+                            data: wordData,
+                            traditional: true
+                        }).done(function(result) {
+                            $('#wordgame').html(result);
+                        });
+                        $('#submit').hide();
+                        $('#regen').show();
+                        $('#dimNumber').hide();
+                        $('#wordsChosen').hide();
+                        $('#wordForm').hide();
+                        for (var i = 0; i < wordArr.length; i++) {
+                            $("#wordList").prepend('<li>' + wordArr[i] + '</li>');
+                        }
+                    }
+                    else {
+                        alert('Please make sure your fields are valid');
+                    }
+                });
+            });
+        });
+    </script>
+
+}

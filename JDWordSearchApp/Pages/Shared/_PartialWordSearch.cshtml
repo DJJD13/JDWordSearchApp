@@ -1,0 +1,31 @@
+﻿@model char[,]
+@{
+    ViewBag.MyArray = new char[5,5];
+    for (var i = 0; i < ViewBag.MyArray.GetLength(0); i++)
+    {
+        for (var j = 0; j < ViewBag.MyArray.GetLength(1); j++)
+        {
+            ViewBag.MyArray[i, j] = 'T';
+        }
+    }
+}
+
+<div class="row mb-5">
+    <div class="col-auto">
+        @if (Model != null)
+        {
+            <table class="table table-borderless">
+                @for (var i = 0; i < Model.GetLength(0); i++)
+                {
+                    <tr>
+                        @for (var j = 0; j < Model.GetLength(1); j++)
+                        {
+                            <td style="width: 35px; height: 35px">@Model.GetValue(i, j)</td>
+                        }
+                    </tr>
+                }
+            </table>
+        }
+    </div>
+</div>
+
