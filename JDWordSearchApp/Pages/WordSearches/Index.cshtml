@@ -7,45 +7,8 @@
 
 <h1>JD's Word Search C# APP</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.WordSearch[0].Dimensions)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WordSearch[0].Words)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.WordSearch) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Dimensions)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Words)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-<p>
-    <a asp-page="Create" class="btn btn-primary">Create New Stored Word Search</a>
-</p>
-
-<h2>Create Word Search App Below</h2>
+<h3>Create a Word Search App Below!</h3>
 <br />
-<br />
-<h6 id="dimNumber">0</h6>
-<ul id="wordsChosen"></ul>
 <br />
 <br />
 <div class="container p-5 align-content-center">
@@ -63,28 +26,35 @@
             <p id="wordcheck" style="color: red;">Word length must be less than the dimensions you set</p>
         </div>
         <br />
-        <button id="submit" class="btn btn-primary">Generate Word Search</button>
+        <div class="col text-center">
+            <button id="submit" class="btn btn-primary">Generate Word Search</button>
+        </div>
     </form>
 </div>
+<div class="align-content-between">
+    <h6 id="dimNumber"></h6>
+    <ul id="wordsChosen" style="float: right;"></ul>
+</div>
 <div class="container">
-    <div class="align-content-center">
-        <button id="regen" class="btn btn-primary">Remake Word Search</button>
+    <div class="col text-center">
+        <button id="regen" class="btn btn-primary mb-3">Remake Word Search</button>
     </div>
     <div class="row">
-        <div id="wordgame" class="col-auto"></div>
-        <div class="col-sm-4">
+        <div id="wordgame" class="col-6"></div>
+        <div class="col-6 bg-info" id="listContain" style="border-radius: 20px; padding: 10px;">
+            <h3 class="col text-center">Solutions</h3>
             <ul id="wordList"></ul>
         </div>
     </div>
 </div>
 
-@*@await Html.PartialAsync("/Pages/Shared/_PartialWordSearch.cshtml", "Hello")*@
 @section scripts{
     <script>
         $(document).ready(function () {
             $('#dimcheck').hide();
             $('#wordcheck').hide();
             $('#regen').hide();
+            $('#listContain').hide();
             let dimError = true;
             let wordError = true;
 
@@ -148,6 +118,7 @@
                         $('#dimNumber').hide();
                         $('#wordsChosen').hide();
                         $('#wordForm').hide();
+                        $('#listContain').show();
                         for (var i = 0; i < wordArr.length; i++) {
                             $("#wordList").prepend('<li>' + wordArr[i] + '</li>');
                         }

@@ -64,12 +64,33 @@ namespace JDWordSearchApp.Pages.WordSearches
                     var len = word.Length;
                     var count = 0;
 
+                    var validCount = true;
+
 
                     // If < 50, the word will be horizontal, else it will be vertical
                     if (horOrVer < 50)
                     {
                         var space = dims - rndCol;
                         if(space < word.Length)
+                        {
+                            continue;
+                        }
+                        for (int j = 0; j < word.Length; j++)
+                        {
+                            if (j < word.Length)
+                            {
+                                if (wordSearchArray[rndRow, rndCol + j] == word[j] || wordSearchArray[rndRow, rndCol + j] == '\0')
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    validCount = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if(validCount == false)
                         {
                             continue;
                         }
@@ -99,8 +120,27 @@ namespace JDWordSearchApp.Pages.WordSearches
                     }
                     else
                     {
-                        var space = dims - rndCol;
+                        var space = dims - rndRow;
                         if (space < word.Length)
+                        {
+                            continue;
+                        }
+                        for (int j = 0; j < word.Length; j++)
+                        {
+                            if (j < word.Length)
+                            {
+                                if (wordSearchArray[j + rndRow, rndCol] == word[j] || wordSearchArray[j + rndRow, rndCol] == '\0')
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                validCount = false;
+                                break;
+                            }
+                        }
+                        if (validCount == false)
                         {
                             continue;
                         }
@@ -112,6 +152,10 @@ namespace JDWordSearchApp.Pages.WordSearches
                                 {
                                     wordSearchArray[j + rndRow, rndCol] = word[j];
                                     count++;
+                                }
+                                else
+                                {
+                                    break;
                                 }
                             }
                         }
