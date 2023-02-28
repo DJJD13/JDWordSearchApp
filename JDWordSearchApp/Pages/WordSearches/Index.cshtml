@@ -5,9 +5,10 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>JD's Word Search C# APP</h1>
 
-<h3>Create a Word Search App Below!</h3>
+<h1 style="display: flex; justify-content: center;">JD's Word Search C# APP</h1>
+
+<h3 style="display: flex; justify-content: center;">Create a Word Search App Below!</h3>
 <br />
 <br />
 <br />
@@ -20,10 +21,11 @@
             <p id="dimcheck" style="color: red;">Please enter only a number</p>
         </div>
         <div class="input-group mb-3">
-            <label class="my-1 me-2" for="words">Enter Words you would like to use</label>
+            <label class="my-1 me-2" for="words">Enter any words you would like to use: </label>
             <input name="words" id="words" type="text" class="form-control"  />
             <button id="AddWord" class="btn btn-info">Add Word</button>
             <p id="wordcheck" style="color: red;">Word length must be less than the dimensions you set</p>
+            <p id="wordlimit" style="color: red;">You have reached the maximum amount of words with these dimensions</p>
         </div>
         <br />
         <div class="col text-center">
@@ -31,9 +33,13 @@
         </div>
     </form>
 </div>
-<div class="align-content-between">
-    <h6 id="dimNumber"></h6>
-    <ul id="wordsChosen" style="float: right;"></ul>
+<div style="display: flex; width: 50%;" id="titles">
+    <h3 style="flex: 1; margin: 10px;">Dimensions</h3>
+    <h3 style="flex: 1; margin: 10px; margin-right: 20px;">Words Chosen</h3>
+</div>
+<div style="display: flex; width: 50%;">
+        <h6 style="flex: 1; margin: 10px;" id="dimNumber"></h6>
+        <ul style="flex: 1; margin: 10px; margin-right: 20px;" id="wordsChosen" style="float: right;"></ul>
 </div>
 <div class="container">
     <div class="col text-center">
@@ -53,16 +59,19 @@
         $(document).ready(function () {
             $('#dimcheck').hide();
             $('#wordcheck').hide();
+            $('#wordlimit').hide();
             $('#regen').hide();
             $('#listContain').hide();
             let dimError = true;
             let wordError = true;
+            let wordLimit = false;
+            let wordCount = 1;
 
-            var wordArr = new Array();
+            let wordArr = new Array();
 
             $(function () {
                 $('#dimensions').on('focusout', function () {
-                    var dim = parseInt($("#dimensions").val());
+                    let dim = parseInt($("#dimensions").val());
                     if (isNaN(dim)) {
                         $('#dimcheck').show();
                         dimError = false;
@@ -76,18 +85,25 @@
             });
             $(function () {
                 $('#AddWord').on('click', function (e) {
-                    var dim = parseInt($('#dimensions').val());
-                    var word = $("#words").val();
+                    let dim = parseInt($('#dimensions').val());
+                    let word = $("#words").val();
                     if(word.length > dim ) {
                         $('#wordcheck').show();
                         wordError = false;
+                        return false;
+                    }  
+                    if(wordCount > dim) {
+                        $('#wordlimit').show();
+                        wordLimit = true;
                         return false;
                     } else {
                         e.preventDefault();
                         $("#wordsChosen").prepend('<li>' + word + '</li>');
                         $('input[type="text"]').val("");
                         $('#wordcheck').hide();
+                        $('#wordlimit').hide();
                         wordError = true;
+                        wordCount = wordCount + 1;
                     }
                     
                 });
@@ -96,14 +112,14 @@
                 $('#submit').on('click', function (e) {
                     if (dimError == true && wordError == true ) {
                         e.preventDefault();
-                        var dim = parseInt($("#dimensions").val());
-                        var listItems = $("#wordsChosen li");
+                        let dim = parseInt($("#dimensions").val());
+                        let listItems = $("#wordsChosen li");
                         listItems.each(function(idx, li) {
-                            var word = $(li).text();
+                            let word = $(li).text();
                             console.log(word);
                             wordArr[idx] = word.toUpperCase();
                         });
-                        var wordData = { dims: dim, words: wordArr };
+                        let wordData = { dims: dim, words: wordArr };
                         console.log(wordData);
                         $.ajax({
                             url: "/WordSearches/Index?handler=Partial",
@@ -116,10 +132,11 @@
                         $('#submit').hide();
                         $('#regen').show();
                         $('#dimNumber').hide();
+                        $('#titles').hide();
                         $('#wordsChosen').hide();
                         $('#wordForm').hide();
                         $('#listContain').show();
-                        for (var i = 0; i < wordArr.length; i++) {
+                        for (let i = 0; i < wordArr.length; i++) {
                             $("#wordList").prepend('<li>' + wordArr[i] + '</li>');
                         }
                     }
@@ -132,8 +149,8 @@
                 $('#regen').on('click', function (e) {
                     if (dimError == true && wordError == true) {
                         e.preventDefault();
-                        var dim = parseInt($("#dimensions").val());
-                        var wordData = { dims: dim, words: wordArr };
+                        let dim = parseInt($("#dimensions").val());
+                        let wordData = { dims: dim, words: wordArr };
                         console.log(wordData);
                         $.ajax({
                             url: "/WordSearches/Index?handler=Partial",

@@ -15,21 +15,8 @@ namespace JDWordSearchApp.Pages.WordSearches
 {
     public class IndexModel : PageModel
     {
-        private readonly JDWordSearchApp.Data.JDWordSearchAppContext _context;
-
-        public IndexModel(JDWordSearchApp.Data.JDWordSearchAppContext context)
+        public void OnGet()
         {
-            _context = context;
-        }
-
-        public IList<WordSearch> WordSearch { get;set; } = default!;
-
-        public async Task OnGetAsync()
-        {
-            if (_context.WordSearch != null)
-            {
-                WordSearch = await _context.WordSearch.ToListAsync();
-            }
         }
 
         public char[,] GenerateWordSearch(int dims, string[] words)
@@ -60,12 +47,6 @@ namespace JDWordSearchApp.Pages.WordSearches
                     int rndRow = rnd.Next(dims);
                     int rndCol = rnd.Next(dims);
                     int horOrVer = rnd.Next(100);
-                    
-                    var len = word.Length;
-                    var count = 0;
-
-                    var validCount = true;
-
 
                     // If < 50, the word will be horizontal, else it will be vertical
                     if (horOrVer < 50)
@@ -75,47 +56,13 @@ namespace JDWordSearchApp.Pages.WordSearches
                         {
                             continue;
                         }
-                        for (int j = 0; j < word.Length; j++)
-                        {
-                            if (j < word.Length)
-                            {
-                                if (wordSearchArray[rndRow, rndCol + j] == word[j] || wordSearchArray[rndRow, rndCol + j] == '\0')
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    validCount = false;
-                                    break;
-                                }
-                            }
-                        }
-                        if(validCount == false)
+                        if(!CheckWordFit(word, wordSearchArray, rndRow, rndCol, 1))
                         {
                             continue;
                         }
                         for (int j = 0; j < word.Length; j++)
                         {
-                            if (j < word.Length)
-                            {
-                                if (wordSearchArray[rndRow, rndCol + j] == word[j] || wordSearchArray[rndRow, rndCol + j] == '\0')
-                                {
-                                    wordSearchArray[rndRow, rndCol + j] = word[j];
-                                    count++;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        if(count == len)
-                        {
-                            inserted = true;
-                        }
-                        else
-                        {
-                            continue;
+                            wordSearchArray[rndRow, rndCol + j] = word[j];
                         }
                     }
                     else
@@ -125,49 +72,16 @@ namespace JDWordSearchApp.Pages.WordSearches
                         {
                             continue;
                         }
-                        for (int j = 0; j < word.Length; j++)
-                        {
-                            if (j < word.Length)
-                            {
-                                if (wordSearchArray[j + rndRow, rndCol] == word[j] || wordSearchArray[j + rndRow, rndCol] == '\0')
-                                {
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                validCount = false;
-                                break;
-                            }
-                        }
-                        if (validCount == false)
+                        if (!CheckWordFit(word, wordSearchArray, rndRow, rndCol, 0))
                         {
                             continue;
                         }
                         for (int j = 0; j < word.Length; j++)
                         {
-                            if (j < word.Length)
-                            {
-                                if (wordSearchArray[j + rndRow, rndCol] == word[j] || wordSearchArray[j + rndRow, rndCol] == '\0')
-                                {
-                                    wordSearchArray[j + rndRow, rndCol] = word[j];
-                                    count++;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        if (count == len)
-                        {
-                            inserted = true;
-                        }
-                        else
-                        {
-                            continue;
+                            wordSearchArray[j + rndRow, rndCol] = word[j];
                         }
                     }
+                    inserted = true;
                 }
             }
 
@@ -185,6 +99,46 @@ namespace JDWordSearchApp.Pages.WordSearches
             return wordSearchArray;
         }
 
+        private bool CheckWordFit(string word, char[,] wordArr, int row, int col, int dir)
+        {
+            if(dir == 1)
+            {
+                for (int j = 0; j < word.Length; j++)
+                {
+                    if (j < word.Length)
+                    {
+                        if (wordArr[row, col + j] == word[j] || wordArr[row, col + j] == '\0')
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int j = 0; j < word.Length; j++)
+                {
+                    if (j < word.Length)
+                    {
+                        if (wordArr[j + row, col] == word[j] || wordArr[j + row, col] == '\0')
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    
+                }
+            }
+            
+            return true;
+        }
 
         public IActionResult OnGetPartial(int dims, string[] words)
         {
